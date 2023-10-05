@@ -12,6 +12,7 @@ import {
 import CartCount from "./cart/CartCount";
 import CartEmpty from "./cart/CartEmpty";
 import CartItem from "./cart/CartItem";
+// import { loadStripe } from "@stripe/stripe-js";
 
 const Cart = () => {
   const dispatch = useDispatch();
@@ -36,6 +37,67 @@ const Cart = () => {
 
   const onClearCartItems = () => {
     dispatch(setClearCartItems())
+  }
+
+  //making payment portal
+  // const makePayment = async() =>{
+  //   const stripe = await loadStripe("pk_test_51NxWWfSEGG8M8ANTdU5P3vGGyoSoiHRspPP4P5LdGOEEKxQ0il65kaCic6acKNNmLEXjhe7PdnkAbE9GGy1SqeRk003rmAVNso");
+  //   const body = {
+  //     products:cartItems
+  //   }  
+  //   console.log(cartItems)
+
+
+  //   const headers={
+  //     "Content-Type":"application/json"
+  //   }
+  //   const response = await fetch("http://localhost:7000/api/create-checkout-session",{
+  //     method:"POST",
+  //     headers:headers,
+  //     body:JSON.stringify(body)
+  //   })
+  //   const session = await response.json();
+  //   // const result = stripe.redirectToCheckout({
+  //   //   sessionId:session.id
+  //   // })
+  //   // if(result.error){
+  //   //   console.log(result.error)
+  //   // } 
+  //   // if(error) console.log(error)
+  // }
+  const loadScript = (src) =>{
+    return new Promise((resolve)=>{
+      const script = document.createElement('script')
+      script.src=src
+      script.onload=()=>{
+        resolve(true)
+      }
+      script.onerror=()=>{
+        resolve(false)
+      }
+      document.body.appendChild(script)
+    })
+  }
+  const makePayment = async(totalAmount) =>{
+    const res = await loadScript('https://checkout.razorpay.com/v1/checkout.js')
+    if(!res){
+      alert("Failed to load")
+      return 
+    }
+    const option = {
+      key: 'rzp_test_bU5ovogsQYPGXx',
+      currency:"USD",
+      amount: totalAmount*100,
+      description:"Thanks for purchasing",
+      handler: function(response){
+        if(response.razorpay_payment_id){
+          alert("Success")
+        }
+      }
+    }
+    const pay = new window.Razorpay(option)
+    pay.open()
+
   }
 
   return (
@@ -69,7 +131,8 @@ const Cart = () => {
               </div>
               <div className="grid items-center gap-2">
                 <p className="text-sm font-medium text-center">Taxes and Shipping Will Calculate At Shipping</p>
-                <button type="button" className="button-theme bg-theme-cart text-white">Check Out</button>
+
+                <button type="button" onClick={()=>makePayment(totalAmount)} className="button-theme bg-theme-cart text-white">Check Out</button>
               </div>
             </div>
 

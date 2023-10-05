@@ -5,3 +5,5 @@ export { default as Sales } from './Sales.jsx';
 export { default as FlexContent } from './FlexContent.jsx';
 export { default as Stories } from './Stories.jsx';
 export { default as Footer } from './Footer.jsx';
+export { default as Success } from './Success.jsx';
+export { default as Cancel } from './Cancel.jsx';
